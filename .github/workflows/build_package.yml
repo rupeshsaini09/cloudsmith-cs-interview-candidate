@@ -1,5 +1,6 @@
 name: Build Python Package
 
+
 on:
   push:
     branches:
@@ -12,7 +13,7 @@ permissions:
   contents: read
   actions: write
   id-token: write
-  
+
 
 jobs:
   build:
