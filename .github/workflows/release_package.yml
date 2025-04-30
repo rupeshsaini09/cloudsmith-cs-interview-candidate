@@ -10,10 +10,11 @@ on:
 
 env:
   CLOUDSMITH_NAMESPACE: ${{ vars.CLOUDSMITH_NAMESPACE }}
-  CLOUDSMITH_REPOSITORY: "staging"
+  CLOUDSMITH_REPOSITORY: "my-repo"
   CLOUDSMITH_SERVICE_SLUG: ${{ vars.CLOUDSMITH_SERVICE_SLUG }}
 
 permissions:
+  id-token: write
   contents: read
   actions: read
 
@@ -32,17 +33,65 @@ jobs:
           github-token: ${{ github.token }}
           run-id: ${{ github.event.workflow_run.id }}
 
-
-
       - name: List directory contents
         run: ls -la dist/
-        shell: bash
 
-      - name: Push package to Cloudsmith
+
+      
+      - name: Get GitHub OIDC Token
+        id: get-oidc-token
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const token = await core.getIDToken();
+            core.setOutput("id_token", token);
+
+      
+      - name: Exchange OIDC token with Cloudsmith (manual method)
+        id: exchange-token
+        continue-on-error: true
         run: |
-          if ! ls dist/*.tar.gz 1> /dev/null 2>&1; then
-            echo "No package found to upload"
-            exit 1
+          echo "Requesting Cloudsmith federated token via OIDC..."
+          RESPONSE=$(curl -s -X POST https://api.cloudsmith.io/v1/oidc/token/ \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            -d '{"audience": "repo:rupeshsaini09/cloudsmith-cs-interview-candidate:*"}' \
+            -H "Authorization: Bearer ${{ steps.get-oidc-token.outputs.id_token }}")
+          
+          TOKEN=$(echo "$RESPONSE" | jq -r '.token')
+
+          if [ "$TOKEN" = "null" ] || [ -z "$TOKEN" ]; then
+            echo "Manual OIDC token exchange failed"
+            echo "cloudsmith_token_success=false" >> $GITHUB_OUTPUT
+          else
+            echo "Received short-lived Cloudsmith token"
+            echo "::add-mask::$TOKEN"
+            echo "CLOUDSMITH_API_KEY=$TOKEN" >> $GITHUB_ENV
+            echo "cloudsmith_token_success=true" >> $GITHUB_OUTPUT
           fi
+
+      # Step 3: Install cloudsmith CLI (used only for manual method)
+      - name: Install Cloudsmith CLI
+        if: steps.exchange-token.outputs.cloudsmith_token_success == 'true'
+        run: pip install cloudsmith-cli
+
+      # Step 4: Push package using manual method if token was received
+      - name: Push to Cloudsmith using manual OIDC token
+        if: steps.exchange-token.outputs.cloudsmith_token_success == 'true'
+        run: |
+          echo "Uploading using manual token method..."
+          cloudsmith push python ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_REPOSITORY }} dist/*.tar.gz --republish --api-key "$CLOUDSMITH_API_KEY"
+
+      # Step 5: Fallback to Cloudsmith Action if manual method failed
+      - name: Authenticate using Cloudsmith Action (fallback)
+        if: steps.exchange-token.outputs.cloudsmith_token_success != 'true'
+        uses: cloudsmith-io/cloudsmith-cli-action@v1.0.3
+        with:
+          oidc-namespace: ${{ env.CLOUDSMITH_NAMESPACE }}
+          oidc-service-slug: ${{ env.CLOUDSMITH_SERVICE_SLUG }}
+
+      - name: Push to Cloudsmith using Cloudsmith Action
+        if: steps.exchange-token.outputs.cloudsmith_token_success != 'true'
+        run: |
+          echo "Fallback: Uploading with Cloudsmith CLI Action"
           cloudsmith push python ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_REPOSITORY }} dist/*.tar.gz --republish
-        shell: bash
