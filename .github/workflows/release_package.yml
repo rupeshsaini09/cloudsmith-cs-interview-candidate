@@ -5,8 +5,7 @@ on:
     workflows: ["Build Python Package"]
     types:
       - completed
-    branches:
-      - main
+
 
 env:
   CLOUDSMITH_NAMESPACE: ${{ vars.CLOUDSMITH_NAMESPACE }}
