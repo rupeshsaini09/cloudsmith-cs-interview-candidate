@@ -13,10 +13,9 @@ env:
   CLOUDSMITH_REPOSITORY: "staging"
   CLOUDSMITH_SERVICE_SLUG: ${{ vars.CLOUDSMITH_SERVICE_SLUG }}
 
-
 permissions:
-  id-token: write
-  contents: read
+  id-token: write                           
+  contents: read                            
 
 jobs:
   publish:
@@ -50,4 +49,3 @@ jobs:
           fi
           echo "Uploading with Cloudsmith CLI Action"
           cloudsmith push python ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_REPOSITORY }} dist/*.tar.gz --republish
-          
