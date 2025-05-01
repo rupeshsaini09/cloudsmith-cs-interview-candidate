@@ -19,8 +19,7 @@ classifiers = [
 ]
 
 [tool.hatch.version]
-source = "vcs" 
-fallback-version = ""                               
+source = "vcs"                              
 
 [tool.hatch.build]
 sources = ["src"]                             
