@@ -1,10 +1,10 @@
 [build-system]
-requires = ["hatchling", "hatch-vcs"]        
-build-backend = "hatchling.build"             
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
 [project]
-name = "python-package"
-dynamic = ["version"]                         
+name = "example_package"                      
+dynamic = ["version"]
 
 authors = [
   { name = "Example Author", email = "author@example.com" },
@@ -20,3 +20,9 @@ classifiers = [
 
 [tool.hatch.version]
 source = "vcs"                                
+
+[tool.hatch.build]
+sources = ["src"]                             
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/example_package"]            
