@@ -18,6 +18,7 @@ jobs:
   promote:
     runs-on: ubuntu-latest
 
+    
     steps:
       - name: Install Cloudsmith CLI
         uses: cloudsmith-io/cloudsmith-cli-action@v1.0.1
@@ -29,7 +30,7 @@ jobs:
         run: |
             echo "package_name: ${{ github.event.client_payload.package_name }}"
             echo "package_version: ${{ github.event.client_payload.package_version }}"
-            
+
       - name: Get package identifier and promote
         run: |
           PACKAGE_NAME="${{ github.event.client_payload.package_name }}"
