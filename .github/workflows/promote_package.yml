@@ -29,11 +29,11 @@ jobs:
         run: |
             echo "package_name: ${{ github.event.client_payload.package_name }}"
             echo "package_version: ${{ github.event.client_payload.package_version }}"
-            echo "slugid: ${{ github.event.client_payload.slugid }}"
+            echo "slugid: ${{ github.event.client_payload.package_name }}"
             
       - name: Tag package as ready-for-production
         run: |
-              SLUGID="${{ github.event.client_payload.slugid }}"
+              SLUGID="${{ github.event.client_payload.package_name }}"
     
               if [ -z "$SLUGID" ] || [ "$SLUGID" = "null" ]; then
                 echo "SlugID is missing. Cannot tag package."
