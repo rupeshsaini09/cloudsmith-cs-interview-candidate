@@ -3,7 +3,7 @@ requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
-name = "python-package"                      
+name = "example_package"                      # ✅ matches your package directory
 dynamic = ["version"]
 
 authors = [
@@ -19,10 +19,10 @@ classifiers = [
 ]
 
 [tool.hatch.version]
-source = "vcs"                                
+source = "vcs"                                # ✅ use Git tag for versioning
 
 [tool.hatch.build]
-sources = ["src"]                             
+sources = ["src"]                             # ✅ tells Hatch to look for packages inside /src
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/example_package"]            
+packages = ["src/example_package"]            # ✅ full path to your actual package
