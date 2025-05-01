@@ -2,8 +2,8 @@ name: Build Python Package
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
   pull_request:
     branches:
       - main
@@ -24,7 +24,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0                    
+           fetch-depth: 0                    
 
       - name: Set up Python
         uses: actions/setup-python@v4
