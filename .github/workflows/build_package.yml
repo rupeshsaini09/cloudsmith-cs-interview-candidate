@@ -23,7 +23,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0                    # ✅ required so Git tags are available to hatch-vcs
+          fetch-depth: 0                    
 
       - name: Set up Python
         uses: actions/setup-python@v4
