@@ -18,6 +18,7 @@ jobs:
   promote:
     runs-on: ubuntu-latest
 
+    
     steps:
       - name: Install Cloudsmith CLI
         uses: cloudsmith-io/cloudsmith-cli-action@v1.0.1
