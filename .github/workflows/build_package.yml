@@ -2,11 +2,8 @@ name: Build Python Package
 
 on:
   push:
-    branches:
-      - main
-    tags: # ✅ ADD THIS SECTION
-      - 'v[0-9]+.[0-9]+.[0-9]+' # Trigger on tags like v1.0.0, v1.2.3 etc.
-      - '[0-9]+.[0-9]+.[0-9]+'  # Trigger on tags like 1.0.0, 1.2.3 etc
+    tags:
+      - 'v*'
   pull_request:
     branches:
       - main

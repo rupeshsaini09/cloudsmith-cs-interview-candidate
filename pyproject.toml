@@ -3,7 +3,7 @@ requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
-name = "python-package"                     
+name = "python-package"
 dynamic = ["version"]
 
 authors = [
@@ -19,10 +19,11 @@ classifiers = [
 ]
 
 [tool.hatch.version]
-source = "vcs"                              
+source = "vcs"
+fallback-version = ""  # ✅ prevents .dev builds without a tag
 
 [tool.hatch.build]
-sources = ["src"]                             
+sources = ["src"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/example_package"]            
+packages = ["src/example_package"]

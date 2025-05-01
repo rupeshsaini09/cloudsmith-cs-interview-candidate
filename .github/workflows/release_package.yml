@@ -5,7 +5,8 @@ on:
     workflows: ["Build Python Package"]
     types:
       - completed
-
+    branches:
+      - main
 
 env:
   CLOUDSMITH_NAMESPACE: ${{ vars.CLOUDSMITH_NAMESPACE }}
@@ -15,17 +16,11 @@ env:
 permissions:
   id-token: write                           # ✅ required for OIDC auth with Cloudsmith
   contents: read                            # ✅ required for downloading artifacts
-  actions: read
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-#    ##if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    if: >
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'push' &&
-      startsWith(github.event.workflow_run.head_branch, 'v') 
-
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Download artifact
@@ -48,14 +43,9 @@ jobs:
 
       - name: Push to Cloudsmith using Cloudsmith Action
         run: |
-          run: |
-          echo "Uploading packages from dist/ to ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_REPOSITORY }}"
-          # Find either wheel or sdist - adjust if you build only one
-          PACKAGE_FILE=$(ls dist/*.whl 2>/dev/null || ls dist/*.tar.gz 2>/dev/null)
-          if [ -z "$PACKAGE_FILE" ]; then
-            echo "No package file (.whl or .tar.gz) found in dist/"
+          if ! ls dist/*.tar.gz 1> /dev/null 2>&1; then
+            echo "No package found to upload"
             exit 1
           fi
-          echo "Found package(s): $PACKAGE_FILE"
-          # Upload all files in dist/
-          cloudsmith push python ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_REPOSITORY }} dist/* --republish
+          echo "Uploading with Cloudsmith CLI Action"
+          cloudsmith push python ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_REPOSITORY }} dist/*.tar.gz --republish
