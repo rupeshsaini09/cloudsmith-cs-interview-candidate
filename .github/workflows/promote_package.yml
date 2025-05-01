@@ -29,25 +29,39 @@ jobs:
         run: |
             echo "package_name: ${{ github.event.client_payload.package_name }}"
             echo "package_version: ${{ github.event.client_payload.package_version }}"
+            echo "slugid": ${{ github.event.client_payload.slugid }}"
             
-      - name: Get package identifier and promote
+      - name: Tag package as ready-for-production
         run: |
-          PACKAGE_VERSION="${{ github.event.client_payload.package_version }}"
-          PACKAGE_QUERY="filename:${PACKAGE_NAME}-${PACKAGE_VERSION}.tar.gz"
-          echo "Searching for package with query: $PACKAGE_QUERY"
-
-          PACKAGE_DATA=$(cloudsmith list package ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }} -q "$PACKAGE_QUERY" -F json)
-
-          IDENTIFIER=$(echo "$PACKAGE_DATA" | jq -r '.data[0].identifier_perm')
-
-          if [ -z "$IDENTIFIER" ] || [ "$IDENTIFIER" = "null" ]; then
-            echo "Failed to find package identifier"
-            exit 1
-          fi
-
-          echo "Found package identifier: $IDENTIFIER"
-
-          cloudsmith mv --yes \
-            ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }}/$IDENTIFIER \
-            ${{ env.CLOUDSMITH_PRODUCTION_REPO }}
-        shell: bash
+              SLUGID="${{ github.event.client_payload.slugid }}"
+    
+              if [ -z "$SLUGID" ] || [ "$SLUGID" = "null" ]; then
+                echo "SlugID is missing. Cannot tag package."
+                exit 1
+              fi
+    
+              echo "Tagging package with 'ready-for-production': $SLUGID"
+    
+              cloudsmith tag package ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }} \
+                "$SLUGID" ready-for-production
+    
+      - name: Promote first ready-for-production package
+        run: |
+              echo "Querying for packages with tag: ready-for-production"
+    
+              PACKAGE_DATA=$(cloudsmith list package ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }} \
+                -q "tag:ready-for-production" -F json)
+    
+              IDENTIFIER=$(echo "$PACKAGE_DATA" | jq -r '.data[0].identifier_perm')
+    
+              if [ -z "$IDENTIFIER" ] || [ "$IDENTIFIER" = "null" ]; then
+                echo "No tagged packages found to promote."
+                exit 1
+              fi
+    
+              echo "Found package identifier: $IDENTIFIER"
+              echo "Promoting package to production..."
+    
+              cloudsmith mv --yes \
+                ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }}/$IDENTIFIER \
+                ${{ env.CLOUDSMITH_PRODUCTION_REPO }}
