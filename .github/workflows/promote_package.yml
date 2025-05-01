@@ -18,7 +18,7 @@ jobs:
   promote:
     runs-on: ubuntu-latest
 
-    
+
     steps:
       - name: Install Cloudsmith CLI
         uses: cloudsmith-io/cloudsmith-cli-action@v1.0.1
@@ -34,8 +34,7 @@ jobs:
       - name: Get package identifier and promote
         run: |
           PACKAGE_NAME="${{ github.event.client_payload.package_name }}"
-          PACKAGE_VERSION="${{ github.event.client_payload.package_version }}"
-          PACKAGE_QUERY="filename:${PACKAGE_NAME}-${PACKAGE_VERSION}.tar.gz"
+          PACKAGE_QUERY="filename:${PACKAGE_NAME}.tar.gz"
           echo "Searching for package with query: $PACKAGE_QUERY"
 
           PACKAGE_DATA=$(cloudsmith list package ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }} -q "$PACKAGE_QUERY" -F json)
