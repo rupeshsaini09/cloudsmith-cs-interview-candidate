@@ -42,8 +42,7 @@ jobs:
     
               echo "Tagging package with 'ready-for-production': $SLUGID"
     
-              cloudsmith tag replace ${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }} \
-                "$SLUGID" ready-for-production
+              cloudsmith tag replace "${{ env.CLOUDSMITH_NAMESPACE }}/${{ env.CLOUDSMITH_STAGING_REPO }}/$SLUGID" ready-for-production
     
       - name: Promote first ready-for-production package
         run: |
