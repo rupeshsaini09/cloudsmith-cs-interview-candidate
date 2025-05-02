@@ -4,7 +4,6 @@ on:
   repository_dispatch:
     types: [cloudsmith.package.synchronized]
 
-
 env:
   CLOUDSMITH_NAMESPACE: ${{ vars.CLOUDSMITH_NAMESPACE }}
   CLOUDSMITH_STAGING_REPO: 'staging'        # 🔁 fixed: was incorrectly set to 'production'
