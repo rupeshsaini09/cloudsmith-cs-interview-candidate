@@ -20,7 +20,7 @@ classifiers = [
 
 [tool.hatch.version]
 source = "vcs"
-fallback-version = ""  # ✅ prevents .dev builds without a tag
+fallback-version = ""  
 
 [tool.hatch.build]
 sources = ["src"]

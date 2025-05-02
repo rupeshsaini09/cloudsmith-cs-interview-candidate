@@ -34,10 +34,10 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install build hatch-vcs      # ✅ added hatch-vcs for dynamic versioning support
+          pip install build hatch-vcs      
 
       - name: Build package
-        run: python -m build               # ✅ added missing build step
+        run: python -m build               
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

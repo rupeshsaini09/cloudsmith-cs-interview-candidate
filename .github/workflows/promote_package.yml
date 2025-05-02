@@ -6,10 +6,10 @@ on:
 
 env:
   CLOUDSMITH_NAMESPACE: ${{ vars.CLOUDSMITH_NAMESPACE }}
-  CLOUDSMITH_STAGING_REPO: 'staging'        # 🔁 fixed: was incorrectly set to 'production'
-  CLOUDSMITH_PRODUCTION_REPO: 'production'  # 🔁 fixed: was incorrectly set to 'staging'
+  CLOUDSMITH_STAGING_REPO: 'staging'        
+  CLOUDSMITH_PRODUCTION_REPO: 'production'  
   CLOUDSMITH_SERVICE_SLUG: ${{ vars.CLOUDSMITH_SERVICE_SLUG }}
-  PACKAGE_NAME: 'python_package'            # 🔁 match [project].name from pyproject.toml
+  PACKAGE_NAME: 'python_package'            
 
 permissions:
   id-token: write
